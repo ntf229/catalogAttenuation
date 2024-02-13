@@ -1,5 +1,3 @@
-# How well can simple dust models reproduce the attenuation curves from the NIHAO-SKIRT-Catalog?
-
 import numpy as np 
 import matplotlib.pyplot as plt 
 import fitsio
@@ -11,6 +9,7 @@ import scipy.optimize as opt
 import dustModels as dm
 from scipy.interpolate import CubicSpline
 from scipy.interpolate import splrep, BSpline
+from matplotlib import rc
 
 def youngAndOldSEDs(galaxy, age):
 	os.system('mkdir -p youngAndOldSEDs/'+galaxy+'/'+age+'/') 
@@ -77,13 +76,8 @@ def getClosestAgeThreshold(galaxy, age):
 	# find bin edges for galaxy within ageMin and ageMax in Gyrs
 	nameMask = singleNames == galaxy
 	xbins = ages[nameMask, :][0]
-	# change bins from left edge to center
-	#xRightEdge = 10**(np.log10(xbins[1]) - np.log10(xbins[0]) + np.log10(xbins[-1]))
-	#xbins = np.append(xbins, xRightEdge)
-	#xbins = (xbins[0:-1] + xbins[1:]) / 2
-	xbins /= 1e9 # conver to Gyrs
+	xbins /= 1e9 # convert to Gyrs
 	index = np.argmin((xbins - age)**2)
-	#ageMask = (xbins >= ageMin) & (xbins <= ageMax)
 	return xbins[index]
 
 def chiSquare(attWaveFSPS, attWaveCatalog, attFSPS, attCatalog):
@@ -95,7 +89,6 @@ def chiSquare(attWaveFSPS, attWaveCatalog, attFSPS, attCatalog):
 
 def calcError(attFSPS):
         # this functions calculates the error between FSPS and catalog attenuation curves
-        #currentMatchedAttCatalog = matchedAttCatalog[nameMaskFull][faceIndex]
         return np.sum(np.sqrt((attFSPS - currentMatchedAttCatalog)**2), axis=-1) / len(errorWave)
 
 def calzettiMin(x):
@@ -124,13 +117,13 @@ def plotCalzetti(x, orientation, frac):
 	dustySpec, attenuationMags = dm.calzetti(errorWave, youngSpec+oldSpec, Av, fracNoDust)
 	os.system('mkdir -p '+plotPath+'best'+name+'/')
 	plt.figure(figsize=(10,8))
-	plt.plot(np.log10(errorWave), attenuationMags, label='Calzetti', alpha=0.5, linewidth=3)
-	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=3)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel(r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=28)
+	plt.plot(np.log10(errorWave), attenuationMags, label='Calzetti', alpha=0.5, linewidth=4.5, linestyle='dashed')
+	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+	plt.xticks(fontsize=42)
+	plt.yticks(fontsize=42)
+	plt.legend(fontsize=30)
 	plt.savefig(plotPath+'best'+name+'/'+name+'_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
 	plt.close()
 
@@ -184,13 +177,13 @@ def plotCardelli(x, orientation, frac):
 	attenuationMags = attenuationMags[:-1]
 	os.system('mkdir -p '+plotPath+'best'+name+'/')
 	plt.figure(figsize=(10,8))
-	plt.plot(np.log10(errorWave), attenuationMags, label='Cardelli', alpha=0.5, linewidth=3)
-	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=3)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel(r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=28)
+	plt.plot(np.log10(errorWave), attenuationMags, label='Cardelli', alpha=0.5, linewidth=4.5, linestyle='dashed')
+	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+	plt.xticks(fontsize=42)
+	plt.yticks(fontsize=42)
+	plt.legend(fontsize=30)
 	plt.savefig(plotPath+'best'+name+'/'+name+'_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
 	plt.close()
 
@@ -236,14 +229,14 @@ def plotPowerLaw(x, orientation, frac):
 	#os.system('mkdir -p '+plotPath+'bestPowerLaw/'+galaxy+'/')
 	os.system('mkdir -p '+plotPath+'best'+name+'/')
 	plt.figure(figsize=(10,8))
-	plt.plot(np.log10(errorWave), attenuationMags, label='Power Law', alpha=0.5, linewidth=3)
+	plt.plot(np.log10(errorWave), attenuationMags, label='Power Law', alpha=0.5, linewidth=4.5, linestyle='dashed')
 	#plt.plot(np.log10(attenuation_wave), attenuation_mags[nameMaskFull][faceIndex], label='Catalog', alpha=0.5)
-	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=3)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel(r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=28)
+	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+	plt.xticks(fontsize=42)
+	plt.yticks(fontsize=42)
+	plt.legend(fontsize=30)
 	plt.savefig(plotPath+'best'+name+'/'+name+'_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
 	plt.close()
 
@@ -289,26 +282,56 @@ def plotKriekAndConroy(x, orientation, frac):
 	#os.system('mkdir -p '+plotPath+'bestKriekAndConroy/'+galaxy+'/')
 	os.system('mkdir -p '+plotPath+'best'+name+'/')
 	plt.figure(figsize=(10,8))
-	plt.plot(np.log10(errorWave), attenuationMags, label='Kriek and Conroy', alpha=0.5, linewidth=3)
+	plt.plot(np.log10(errorWave), attenuationMags, label='Kriek and Conroy', alpha=0.5, linewidth=4.5, linestyle='dashed')
 	#plt.plot(np.log10(attenuation_wave), attenuation_mags[nameMaskFull][faceIndex], label='Catalog', alpha=0.5)
-	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=3)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel(r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=28)
+	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+	plt.xticks(fontsize=42)
+	plt.yticks(fontsize=42)
+	plt.legend(fontsize=30)
 	plt.savefig(plotPath+'best'+name+'/'+name+'_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
 	plt.close()
 
-def faucherMin(x):
+# old version with 4 free parameters
+#def TEAMin(x):
+#	Av = x[0]
+#	dustIndex = x[1]
+#	bumpStrength = x[2]
+#	bumpSkew = x[3]
+#	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength, bumpSkew)
+#	return calcError(attenuationMags)
+#
+#def plotTEA(x, orientation):
+#	if orientation == 'face-on':
+#		index = faceIndex
+#	elif orientation == 'edge-on':
+#		index = edgeIndex
+#	Av = x[0]
+#	dustIndex = x[1]
+#	bumpStrength = x[2]
+#	bumpSkew = x[3]
+#	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength, bumpSkew)
+#	os.system('mkdir -p '+plotPath+'bestTEA/')
+#	plt.figure(figsize=(10,8))
+#	plt.plot(np.log10(errorWave), attenuationMags, label='TEA', alpha=0.5, linewidth=4.5, linestyle='dashed')
+#	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+#	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+#	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+#	plt.xticks(fontsize=42)
+#	plt.yticks(fontsize=42)
+#	plt.legend(fontsize=30)
+#	plt.savefig(plotPath+'bestTEA/TEA_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+#	plt.close()
+
+def TEAMin(x):
 	Av = x[0]
 	dustIndex = x[1]
 	bumpStrength = x[2]
-	bumpSkew = x[3]
-	dustySpec, attenuationMags = dm.Faucher(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength, bumpSkew)
+	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength)
 	return calcError(attenuationMags)
 
-def plotFaucher(x, orientation):
+def plotTEA(x, orientation):
 	if orientation == 'face-on':
 		index = faceIndex
 	elif orientation == 'edge-on':
@@ -316,41 +339,113 @@ def plotFaucher(x, orientation):
 	Av = x[0]
 	dustIndex = x[1]
 	bumpStrength = x[2]
-	bumpSkew = x[3]
-	dustySpec, attenuationMags = dm.Faucher(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength, bumpSkew)
-	os.system('mkdir -p '+plotPath+'bestFaucher/')
+	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, bumpStrength)
+	os.system('mkdir -p '+plotPath+'bestTEA/')
 	plt.figure(figsize=(10,8))
-	plt.plot(np.log10(errorWave), attenuationMags, label='Faucher', alpha=0.5, linewidth=3)
-	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=3)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel(r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=28)
-	plt.savefig(plotPath+'bestFaucher/Faucher_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+	plt.plot(np.log10(errorWave), attenuationMags, label='TEA', alpha=0.5, linewidth=4.5, linestyle='dashed')
+	plt.plot(np.log10(errorWave), matchedAttCatalog[nameMaskFull][index], label='Catalog', alpha=0.5, linewidth=4.5)
+	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=42)
+	plt.ylabel(r'$A_{\lambda}$',fontsize=42)
+	plt.xticks(fontsize=42)
+	plt.yticks(fontsize=42)
+	plt.legend(fontsize=30)
+	plt.savefig(plotPath+'bestTEA/simpleTEA_'+galaxy+'_'+orientation+'_attenuation.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
 	plt.close()
 
-def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kriekAndConroyBestParams, faucherBestParams, frac):
+def plotErrorsSeparate(fullErrors, frac):
+	if frac == 'noFrac':
+		folder = 'residualsNoFrac/'
+		ext = 'NoFrac'
+	else:
+		folder = 'residuals/'
+		ext = ''
+	size = 200
+	plt.figure(figsize=(10,8))
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,0]), label='Calzetti', color='pink', marker='s', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,0]), label='Cardelli', color='sandybrown', marker='^', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,0]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,0]), label='Kriek and Conroy', color='cornflowerblue', marker='D', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,0]), label='TEA', color='darkgreen', marker='*', alpha=0.7, s=size*1.5, linewidth=0)
+	#plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,0]), label='TEATwoComponent', color='maroon', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
+	plt.ylabel(r'$\log_{10}(RMSE)$',fontsize=28)
+	plt.title('Face-on',fontsize=28)
+	plt.xticks(fontsize=28)
+	plt.yticks(fontsize=28)
+	plt.legend(fontsize=20)
+	plt.savefig(plotPath+folder+'face-on_errors'+ext+'.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+	plt.close()
+	plt.figure(figsize=(10,8))
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,1]), label='Calzetti', color='pink', marker='s', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,1]), label='Cardelli', color='sandybrown', marker='^', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,1]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,1]), label='Kriek and Conroy', color='cornflowerblue', marker='D', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,1]), label='TEA', color='darkgreen', marker='*', alpha=0.7, s=size*1.5, linewidth=0)
+	#plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,1]), label='TEATwoComponent', color='maroon', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
+	plt.ylabel(r'$\log_{10}(RMSE)$',fontsize=28)
+	plt.title('Edge-on',fontsize=28)
+	plt.xticks(fontsize=28)
+	plt.yticks(fontsize=28)
+	plt.legend(fontsize=20)
+	plt.savefig(plotPath+folder+'edge-on_errors'+ext+'.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+	plt.close()
+
+def plotErrorsSeparateShifted(fullErrors, frac):
+	if frac == 'noFrac':
+		folder = 'residualsNoFrac/'
+		ext = 'NoFrac'
+	else:
+		folder = 'residuals/'
+		ext = ''
+	size = 200
+	plt.figure(figsize=(10,8))
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,0]/fullErrors[:,5,0]), label='Calzetti', color='pink', marker='s', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,0]/fullErrors[:,5,0]), label='Cardelli', color='sandybrown', marker='^', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,0]/fullErrors[:,5,0]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,0]/fullErrors[:,5,0]), label='Kriek and Conroy', color='cornflowerblue', marker='D', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,0]/fullErrors[:,5,0]), label='TEA', color='darkgreen', marker='*', alpha=0.7, s=size*1.5, linewidth=0)
+	#plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,0]), label='TEATwoComponent', color='maroon', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
+	plt.ylabel(r'$\log_{10}(RMSE \, / \, RMSE_{TEA})$',fontsize=28)
+	plt.title('Face-on',fontsize=28)
+	plt.xticks(fontsize=28)
+	plt.yticks(fontsize=28)
+	plt.legend(fontsize=20)
+	plt.savefig(plotPath+folder+'shifted_face-on_errors'+ext+'.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+	plt.close()
+	plt.figure(figsize=(10,8))
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,1]/fullErrors[:,5,1]), label='Calzetti', color='pink', marker='s', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,1]/fullErrors[:,5,1]), label='Cardelli', color='sandybrown', marker='^', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,1]/fullErrors[:,5,1]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,1]/fullErrors[:,5,1]), label='Kriek and Conroy', color='cornflowerblue', marker='D', alpha=0.7, s=size, linewidth=0)
+	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,1]/fullErrors[:,5,1]), label='TEA', color='darkgreen', marker='*', alpha=0.7, s=size*1.5, linewidth=0)
+	#plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,5,1]), label='TEATwoComponent', color='maroon', marker='o', alpha=0.7, s=size, linewidth=0)
+	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
+	plt.ylabel(r'$\log_{10}(RMSE \, / \, RMSE_{TEA})$',fontsize=28)
+	plt.title('Edge-on',fontsize=28)
+	plt.xticks(fontsize=28)
+	plt.yticks(fontsize=28)
+	plt.legend(fontsize=20)
+	plt.savefig(plotPath+folder+'shifted_edge-on_errors'+ext+'.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
+	plt.close()
+
+def calcAllErrors(calzettiBestParams, cardelliBestParams, powerLawBestParams, kriekAndConroyBestParams, TEABestParams, frac):
 	if frac == 'noFrac':
 		folder = 'residualsNoFrac/'
 	else:
 		folder = 'residuals/'
 	errors = np.zeros((5,2)) # model, orientation
 	os.system('mkdir -p '+plotPath+folder)
-	plt.figure(figsize=(10,8))
 	# calzetti face-on
 	Av = calzettiBestParams[0,0]
 	fracNoDust = calzettiBestParams[0,1]
 	dustySpec, attenuationMags = dm.calzetti(errorWave, youngSpec+oldSpec, Av, fracNoDust)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex], 
-			 label='Calzetti Face-on', alpha=0.7, color='red', linestyle='solid')
 	errors[0,0] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex])**2), axis=-1) / len(errorWave)
 	# calzetti edge-on
 	Av = calzettiBestParams[1,0]
 	fracNoDust = calzettiBestParams[1,1]
 	dustySpec, attenuationMags = dm.calzetti(errorWave, youngSpec+oldSpec, Av, fracNoDust)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex], 
-			 label='Calzetti Edge-on', alpha=0.7, color='red', linestyle='dashed')
 	errors[0,1] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex])**2), axis=-1) / len(errorWave)
 	# cardelli face-on
 	Av = cardelliBestParams[0,0]
@@ -364,8 +459,6 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 			 					 dustIndexYoung, fracNoDust, fracNoDustYoung)
 	dustySpec = dustySpec[:-1]
 	attenuationMags = attenuationMags[:-1]
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex], 
-			 label='Cardelli Face-on', alpha=0.7, color='black', linestyle='solid')
 	errors[1,0] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex])**2), axis=-1) / len(errorWave)
 	# cardelli edge-on
 	Av = cardelliBestParams[1,0]
@@ -379,8 +472,6 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 			 					 dustIndexYoung, fracNoDust, fracNoDustYoung)
 	dustySpec = dustySpec[:-1]
 	attenuationMags = attenuationMags[:-1]
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex], 
-			 label='Cardelli Edge-on', alpha=0.7, color='black', linestyle='dashed')
 	errors[1,1] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex])**2), axis=-1) / len(errorWave)
 	# power law face-on
 	Av = powerLawBestParams[0,0]
@@ -391,8 +482,6 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 	fracNoDustYoung = powerLawBestParams[0,5]
 	dustySpec, attenuationMags = dm.powerLaw(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 AvYoung, dustIndexYoung, fracNoDust, fracNoDustYoung)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex], 
-			 label='Power Law Face-on', alpha=0.7, color='orange', linestyle='solid')
 	errors[2,0] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex])**2), axis=-1) / len(errorWave)
 	# power law edge-on
 	Av = powerLawBestParams[1,0]
@@ -403,8 +492,6 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 	fracNoDustYoung = powerLawBestParams[1,5]
 	dustySpec, attenuationMags = dm.powerLaw(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 AvYoung, dustIndexYoung, fracNoDust, fracNoDustYoung)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex], 
-			 label='Power Law Edge-on', alpha=0.7, color='orange', linestyle='dashed')
 	errors[2,1] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex])**2), axis=-1) / len(errorWave)
 	# kriek and conroy face-on
 	Av = kriekAndConroyBestParams[0,0]
@@ -415,8 +502,6 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 	fracNoDustYoung = kriekAndConroyBestParams[0,5]
 	dustySpec, attenuationMags = dm.kriekAndConroy(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 AvYoung, dustIndexYoung, fracNoDust, fracNoDustYoung)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex], 
-			 label='Kriek and Conroy Face-on', alpha=0.7, color='blue', linestyle='solid')
 	errors[3,0] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex])**2), axis=-1) / len(errorWave)
 	# kriek and conroy edge-on
 	Av = kriekAndConroyBestParams[1,0]
@@ -427,123 +512,24 @@ def plotResiduals(calzettiBestParams, cardelliBestParams, powerLawBestParams, kr
 	fracNoDustYoung = kriekAndConroyBestParams[1,5]
 	dustySpec, attenuationMags = dm.kriekAndConroy(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 AvYoung, dustIndexYoung, fracNoDust, fracNoDustYoung)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex], 
-			 label='Kriek and Conroy Edge-on', alpha=0.7, color='blue', linestyle='dashed')
 	errors[3,1] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex])**2), axis=-1) / len(errorWave)
-	# faucher face-on
-	Av = faucherBestParams[0,0]
-	dustIndex = faucherBestParams[0,1]
-	bumpStrength = faucherBestParams[0,2]
-	bumpSkew = faucherBestParams[0,3]
-	dustySpec, attenuationMags = dm.Faucher(errorWave, youngSpec, oldSpec, Av, dustIndex, 
+	# TEA face-on
+	Av = TEABestParams[0,0]
+	dustIndex = TEABestParams[0,1]
+	bumpStrength = TEABestParams[0,2]
+	bumpSkew = TEABestParams[0,3]
+	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 bumpStrength, bumpSkew)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex], 
-			 label='Faucher Face-on', alpha=0.7, color='green', linestyle='solid')
 	errors[4,0] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][faceIndex])**2), axis=-1) / len(errorWave)
-	# faucher edge-on
-	Av = faucherBestParams[1,0]
-	dustIndex = faucherBestParams[1,1]
-	bumpStrength = faucherBestParams[1,2]
-	bumpSkew = faucherBestParams[1,3]
-	dustySpec, attenuationMags = dm.Faucher(errorWave, youngSpec, oldSpec, Av, dustIndex, 
+	# TEA edge-on
+	Av = TEABestParams[1,0]
+	dustIndex = TEABestParams[1,1]
+	bumpStrength = TEABestParams[1,2]
+	bumpSkew = TEABestParams[1,3]
+	dustySpec, attenuationMags = dm.TEA(errorWave, youngSpec, oldSpec, Av, dustIndex, 
 								 bumpStrength, bumpSkew)
-	plt.plot(np.log10(errorWave), attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex], 
-			 label='Faucher Edge-on', alpha=0.7, color='green', linestyle='dashed')
 	errors[4,1] = np.sum(np.sqrt((attenuationMags - matchedAttCatalog[nameMaskFull][edgeIndex])**2), axis=-1) / len(errorWave)
-	plt.xlabel(r'$\log_{10}(\lambda \, / \, \AA)$', fontsize=28)
-	plt.ylabel('Residual '+r'$A_{\lambda}$',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=16)
-	plt.savefig(plotPath+folder+galaxy+'_residuals.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
-	plt.close()
 	return errors
-
-def plotErrors(fullErrors, frac):
-	if frac == 'noFrac':
-		folder = 'residualsNoFrac/'
-	else:
-		folder = 'residuals/'
-	plt.figure(figsize=(10,8))
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,0]), label='Calzetti Face-on', color='pink', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,1]), label='Calzetti Edge-on', color='pink', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,0]), label='Cardelli Face-on', color='sandybrown', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,1]), label='Cardelli Edge-on', color='sandybrown', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,0]), label='Power Law Face-on', color='tomato', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,1]), label='Power Law Edge-on', color='tomato', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,0]), label='Kriek and Conroy Face-on', color='cornflowerblue', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,1]), label='Kriek and Conroy Edge-on', color='cornflowerblue', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,0]), label='Faucher Face-on', color='darkgreen', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,1]), label='Faucher Edge-on', color='darkgreen', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
-	plt.ylabel(r'$\log_{10}(RMSE)$',fontsize=28)
-	#plt.xticks(ticks=[10,10.5,11,11.5])
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=10)
-	plt.savefig(plotPath+folder+'errors.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
-	plt.close()
-
-def plotErrorsSeparate(fullErrors, frac):
-	if frac == 'noFrac':
-		folder = 'residualsNoFrac/'
-	else:
-		folder = 'residuals/'
-	size = 200
-	plt.figure(figsize=(10,8))
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,0]), label='Calzetti', color='pink', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,0]), label='Cardelli', color='sandybrown', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,0]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,0]), label='Kriek and Conroy', color='cornflowerblue', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,0]), label='Faucher', color='darkgreen', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
-	plt.ylabel(r'$\log_{10}(RMSE)$',fontsize=28)
-	plt.title('Face-on',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=20)
-	plt.savefig(plotPath+folder+'face-on_errors.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
-	plt.close()
-	plt.figure(figsize=(10,8))
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,1]), label='Calzetti', color='pink', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,1]), label='Cardelli', color='sandybrown', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,1]), label='Power Law', color='tomato', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,1]), label='Kriek and Conroy', color='cornflowerblue', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,1]), label='Faucher', color='darkgreen', marker='o', alpha=0.7, s=size, linewidth=0)
-	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
-	plt.ylabel(r'$\log_{10}(RMSE)$',fontsize=28)
-	plt.title('Edge-on',fontsize=28)
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=20)
-	plt.savefig(plotPath+folder+'edge-on_errors.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
-	plt.close()
-
-def plotScaledErrors(fullErrors, frac):
-	if frac == 'noFrac':
-		folder = 'residualsNoFrac/'
-	else:
-		folder = 'residuals/'
-	# matchedAttCatalog[nameMaskFull][faceIndex]
-	plt.figure(figsize=(10,8))
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,0] / avgAlambda[:,0]), label='Calzetti Face-on', color='pink', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,0,1] / avgAlambda[:,1]), label='Calzetti Edge-on', color='pink', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,0] / avgAlambda[:,0]), label='Cardelli Face-on', color='sandybrown', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,1,1] / avgAlambda[:,1]), label='Cardelli Edge-on', color='sandybrown', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,0] / avgAlambda[:,0]), label='Power Law Face-on', color='tomato', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,2,1] / avgAlambda[:,1]), label='Power Law Edge-on', color='tomato', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,0] / avgAlambda[:,0]), label='Kriek and Conroy Face-on', color='cornflowerblue', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,3,1] / avgAlambda[:,1]), label='Kriek and Conroy Edge-on', color='cornflowerblue', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,0] / avgAlambda[:,0]), label='Faucher Face-on', color='darkgreen', marker='o', alpha=0.7, s=150, linewidth=0)
-	plt.scatter(np.log10(singleStellarMass[minAvMask]), np.log10(fullErrors[:,4,1] / avgAlambda[:,1]), label='Faucher Edge-on', color='darkgreen', marker='s', alpha=0.7, s=150, linewidth=0)
-	plt.xlabel(r'$\log_{10}(Stellar \; Mass \, / \, M_{\odot})$', fontsize=28)
-	plt.ylabel(r'$\log_{10}(\frac{RMSE}{\langle A_{\lambda} \rangle})$', fontsize=28)
-	#plt.xticks(ticks=[10,10.5,11,11.5])
-	plt.xticks(fontsize=28)
-	plt.yticks(fontsize=28)
-	plt.legend(fontsize=10)
-	plt.savefig(plotPath+folder+'scaledErrors.png', dpi=300, bbox_inches='tight', pad_inches=0.5)
-	plt.close()
 
 def matchWavelengths(wave, mags):
 	newMags = np.zeros(len(errorWave))
@@ -575,7 +561,6 @@ youngAndOldSEDsPath = 'youngAndOldSEDs/'
 plotPath = 'Plots/'
 os.system('mkdir -p '+plotPath)
 
-#ageThresholdRange = [0.009, 0.01] # in Gyrs
 ageThreshold = 0.01
 
 # Load fits file
@@ -648,17 +633,19 @@ waveMask = (waveFSPS >= 1e3) & (waveFSPS <= 2e4)
 waveFSPS = waveFSPS[waveMask]
 
 if fit:
+	maxIter = 2000
 	calzettiBestParams = np.zeros((len(singleNames[minAvMask]), 2, 2)) # galaxy, orientation, parameter
 	cardelliBestParams = np.zeros((len(singleNames[minAvMask]), 2, 7))
 	powerLawBestParams = np.zeros((len(singleNames[minAvMask]), 2, 6))
 	kriekAndConroyBestParams = np.zeros((len(singleNames[minAvMask]), 2, 6))
-	faucherBestParams = np.zeros((len(singleNames[minAvMask]), 2, 4))
+	TEABestParams = np.zeros((len(singleNames[minAvMask]), 2, 4))
+	simpleTEABestParams = np.zeros((len(singleNames[minAvMask]), 2, 3))
 	# fracNoDust and fracNoDustYoung fixed to 0
 	calzettiNoFracBestParams = np.zeros((len(singleNames[minAvMask]), 2, 2)) # galaxy, orientation, parameter
 	cardelliNoFracBestParams = np.zeros((len(singleNames[minAvMask]), 2, 7))
 	powerLawNoFracBestParams = np.zeros((len(singleNames[minAvMask]), 2, 6))
 	kriekAndConroyNoFracBestParams = np.zeros((len(singleNames[minAvMask]), 2, 6))
-	for i in range(len(singleNames[minAvMask])): # only loop over galaxies with minimum Av > 0.2
+	for i in range(len(singleNames[minAvMask])): 
 		galaxy = singleNames[minAvMask][i]
 		print('fitting', galaxy)
 		nameMaskFull = names == galaxy
@@ -674,52 +661,54 @@ if fit:
 		youngSpecExt = matchWavelengthsExt(waveFSPS, youngSpec_full)
 		oldSpecExt = matchWavelengthsExt(waveFSPS, oldSpec_full)
 		# find best parameters
+		# face-on
 		currentMatchedAttCatalog = matchedAttCatalog[nameMaskFull][faceIndex]
-		calzettiResultFace = opt.dual_annealing(calzettiMin, maxiter=2000,
-						 bounds=((0.,5.), (0., 1.0)))
-		cardelliResultFace = opt.dual_annealing(cardelliMin, maxiter=2000,
-						 bounds=((0.,5.), (0., 10.0), (0., 10.0), (0., 1.0), (-10., 0.), (0., 1.0), (0., 1.0)))
-		powerLawResultFace = opt.dual_annealing(powerLawMin, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.), (0., 1.), (0., 1.)))
-		kriekAndConroyResultFace = opt.dual_annealing(kriekAndConroyMin, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.), (0., 1.), (0., 1.)))
-		faucherResultFace = opt.dual_annealing(faucherMin, maxiter=2000,
-						 bounds=((0.,10.), (-3., 0.), (0.0,10), (-20,20)))
+		calzettiResultFace = opt.dual_annealing(calzettiMin, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 1.0)))
+		cardelliResultFace = opt.dual_annealing(cardelliMin, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 10.0), (0., 10.0), (0., 10.0), (-5., 0.), (0., 1.0), (0., 1.0)))
+		powerLawResultFace = opt.dual_annealing(powerLawMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.), (0., 1.), (0., 1.)))
+		kriekAndConroyResultFace = opt.dual_annealing(kriekAndConroyMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.), (0., 1.), (0., 1.)))
+		TEAResultFace = opt.dual_annealing(TEAMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.0,10)))
 		# fracNoDust and fracNoDustYoung fixed to 0
 		calzettiNoFracResultFace = opt.minimize_scalar(calzettiMinNoFrac,
-						 bounds=((0.,5.)))
-		cardelliNoFracResultFace = opt.dual_annealing(cardelliMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (0., 10.0), (0., 10.0), (0., 1.0), (-10., 0.)))
-		powerLawNoFracResultFace = opt.dual_annealing(powerLawMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.)))
-		kriekAndConroyNoFracResultFace = opt.dual_annealing(kriekAndConroyMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.)))
+						 bounds=((0.,10.)))
+		cardelliNoFracResultFace = opt.dual_annealing(cardelliMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 10.0), (0., 10.0), (0., 10.0), (-5., 0.)))
+		powerLawNoFracResultFace = opt.dual_annealing(powerLawMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.)))
+		kriekAndConroyNoFracResultFace = opt.dual_annealing(kriekAndConroyMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.)))
+		# edge-on
 		currentMatchedAttCatalog = matchedAttCatalog[nameMaskFull][edgeIndex]
-		calzettiResultEdge = opt.dual_annealing(calzettiMin, maxiter=2000,
-						 bounds=((0.,5.), (0., 1.0)))
-		cardelliResultEdge = opt.dual_annealing(cardelliMin, maxiter=2000,
-						 bounds=((0.,5.), (0., 10.0), (0., 10.0), (0., 1.0), (-10., 0.), (0., 1.0), (0., 1.0)))
-		powerLawResultEdge = opt.dual_annealing(powerLawMin, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.), (0., 1.), (0., 1.)))
-		kriekAndConroyResultEdge = opt.dual_annealing(kriekAndConroyMin, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.), (0., 1.), (0., 1.)))
-		faucherResultEdge = opt.dual_annealing(faucherMin, maxiter=2000,
-						 bounds=((0.,10.), (-3., 0.), (0.0,10), (-20,20)))
+		calzettiResultEdge = opt.dual_annealing(calzettiMin, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 1.0)))
+		cardelliResultEdge = opt.dual_annealing(cardelliMin, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 10.0), (0., 10.0), (0., 10.0), (-5., 0.), (0., 1.0), (0., 1.0)))
+		powerLawResultEdge = opt.dual_annealing(powerLawMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.), (0., 1.), (0., 1.)))
+		kriekAndConroyResultEdge = opt.dual_annealing(kriekAndConroyMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.), (0., 1.), (0., 1.)))
+		TEAResultEdge = opt.dual_annealing(TEAMin, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.0,10)))
 		# fracNoDust and fracNoDustYoung fixed to 0
 		calzettiNoFracResultEdge = opt.minimize_scalar(calzettiMinNoFrac,
-						 bounds=((0.,5.)))
-		cardelliNoFracResultEdge = opt.dual_annealing(cardelliMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (0., 10.0), (0., 10.0), (0., 1.0), (-10., 0.)))
-		powerLawNoFracResultEdge = opt.dual_annealing(powerLawMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.)))
-		kriekAndConroyNoFracResultEdge = opt.dual_annealing(kriekAndConroyMinNoFrac, maxiter=2000,
-						 bounds=((0.,5.), (-10., 0.), (0.,5.), (-10., 0.)))
+						 bounds=((0.,10.)))
+		cardelliNoFracResultEdge = opt.dual_annealing(cardelliMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (0., 10.0), (0., 10.0), (0., 10.0), (-5., 0.)))
+		powerLawNoFracResultEdge = opt.dual_annealing(powerLawMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.)))
+		kriekAndConroyNoFracResultEdge = opt.dual_annealing(kriekAndConroyMinNoFrac, maxiter=maxIter,
+						 bounds=((0.,10.), (-5., 0.), (0.,10.), (-5., 0.)))
 		# face-on
 		calzettiBestParams[i,0,:] = calzettiResultFace.x
 		cardelliBestParams[i,0,:] = cardelliResultFace.x
 		powerLawBestParams[i,0,:] = powerLawResultFace.x
 		kriekAndConroyBestParams[i,0,:] = kriekAndConroyResultFace.x
-		faucherBestParams[i,0,:] = faucherResultFace.x
+		TEABestParams[i,0,:] = TEAResultFace.x
 		calzettiNoFracBestParams[i,0,:] = np.append(calzettiNoFracResultFace.x, [0])
 		cardelliNoFracBestParams[i,0,:] = np.append(cardelliNoFracResultFace.x, [0,0])
 		powerLawNoFracBestParams[i,0,:] = np.append(powerLawNoFracResultFace.x, [0,0])
@@ -729,7 +718,7 @@ if fit:
 		cardelliBestParams[i,1,:] = cardelliResultEdge.x
 		powerLawBestParams[i,1,:] = powerLawResultEdge.x
 		kriekAndConroyBestParams[i,1,:] = kriekAndConroyResultEdge.x
-		faucherBestParams[i,1,:] = faucherResultEdge.x
+		TEABestParams[i,1,:] = TEAResultEdge.x
 		calzettiNoFracBestParams[i,1,:] = np.append(calzettiNoFracResultEdge.x, [0])
 		cardelliNoFracBestParams[i,1,:] = np.append(cardelliNoFracResultEdge.x, [0,0])
 		powerLawNoFracBestParams[i,1,:] = np.append(powerLawNoFracResultEdge.x, [0,0])
@@ -739,25 +728,27 @@ if fit:
 	np.save('bestParams/cardelliBestParams.npy', cardelliBestParams)
 	np.save('bestParams/powerLawBestParams.npy', powerLawBestParams)
 	np.save('bestParams/kriekAndConroyBestParams.npy', kriekAndConroyBestParams)
-	np.save('bestParams/faucherBestParams.npy', faucherBestParams)
+	np.save('bestParams/TEABestParams.npy', TEABestParams)
 	np.save('bestParams/calzettiNoFracBestParams.npy', calzettiNoFracBestParams)
 	np.save('bestParams/cardelliNoFracBestParams.npy', cardelliNoFracBestParams)
 	np.save('bestParams/powerLawNoFracBestParams.npy', powerLawNoFracBestParams)
 	np.save('bestParams/kriekAndConroyNoFracBestParams.npy', kriekAndConroyNoFracBestParams)
 
 if makePlots:
-	fullErrors = np.zeros((len(singleNames[minAvMask]), 5, 2)) # galaxy, model, orientation
-	fullErrorsNoFrac = np.zeros((len(singleNames[minAvMask]), 5, 2)) # galaxy, model, orientation
+	fullErrors = np.zeros((len(singleNames[minAvMask]), 6, 2)) # galaxy, model, orientation
+	fullErrorsNoFrac = np.zeros((len(singleNames[minAvMask]), 6, 2)) # galaxy, model, orientation
+	faceEdgeAv = np.zeros((len(singleNames[minAvMask]), 2)) # galaxy, orientation 
 	calzettiBestParams = np.load('bestParams/calzettiBestParams.npy')
 	cardelliBestParams = np.load('bestParams/cardelliBestParams.npy')
 	powerLawBestParams = np.load('bestParams/powerLawBestParams.npy')
 	kriekAndConroyBestParams = np.load('bestParams/kriekAndConroyBestParams.npy')
-	faucherBestParams = np.load('bestParams/faucherBestParams.npy')
+	TEABestParams = np.load('bestParams/TEABestParams.npy')
 	calzettiNoFracBestParams = np.load('bestParams/calzettiNoFracBestParams.npy')
 	cardelliNoFracBestParams = np.load('bestParams/cardelliNoFracBestParams.npy')
 	powerLawNoFracBestParams = np.load('bestParams/powerLawNoFracBestParams.npy')
 	kriekAndConroyNoFracBestParams = np.load('bestParams/kriekAndConroyNoFracBestParams.npy')
 	avgAlambda = np.zeros((len(singleNames[minAvMask]), 2)) # galaxy, orientation
+	closestAgeDist = np.zeros((len(singleNames[minAvMask])))
 	for i in range(len(singleNames[minAvMask])):
 		galaxy = singleNames[minAvMask][i]
 		print('plotting', galaxy)
@@ -766,8 +757,10 @@ if makePlots:
 		edgeIndex = np.argmin(axisRatios[nameMaskFull])
 		avgAlambda[i, 0] = np.average(matchedAttCatalog[nameMaskFull][faceIndex])
 		avgAlambda[i, 1] = np.average(matchedAttCatalog[nameMaskFull][edgeIndex])
-		trueAv = Av[nameMaskFull][faceIndex]
+		faceEdgeAv[i, 0] = Av[nameMaskFull][faceIndex]
+		faceEdgeAv[i, 1] = Av[nameMaskFull][edgeIndex]
 		closestAge = getClosestAgeThreshold(singleNames[minAvMask][i], ageThreshold)
+		closestAgeDist[i] = closestAge
 		age = str(closestAge)
 		youngSpec_full = np.load(youngAndOldSEDsPath+galaxy+'/'+age+'/young.npy')[waveMask]
 		oldSpec_full = np.load(youngAndOldSEDsPath+galaxy+'/'+age+'/old.npy')[waveMask]
@@ -775,35 +768,36 @@ if makePlots:
 		oldSpec = matchWavelengths(waveFSPS, oldSpec_full)
 		youngSpecExt = matchWavelengthsExt(waveFSPS, youngSpec_full)
 		oldSpecExt = matchWavelengthsExt(waveFSPS, oldSpec_full)
-		#plotCalzetti(calzettiBestParams[i,0,:], 'face-on', 'frac')
-		#plotCardelli(cardelliBestParams[i,0,:], 'face-on', 'frac')
-		#plotPowerLaw(powerLawBestParams[i,0,:], 'face-on', 'frac')
-		#plotKriekAndConroy(kriekAndConroyBestParams[i,0,:], 'face-on', 'frac')
-		#plotFaucher(faucherBestParams[i,0,:], 'face-on')
-		#plotCalzetti(calzettiNoFracBestParams[i,0,:], 'face-on', 'noFrac')
-		#plotCardelli(cardelliNoFracBestParams[i,0,:], 'face-on', 'noFrac')
-		#plotPowerLaw(powerLawNoFracBestParams[i,0,:], 'face-on', 'noFrac')
-		#plotKriekAndConroy(kriekAndConroyNoFracBestParams[i,0,:], 'face-on', 'noFrac')
-		#plotCalzetti(calzettiBestParams[i,1,:], 'edge-on', 'frac')
-		#plotCardelli(cardelliBestParams[i,1,:], 'edge-on', 'frac')
-		#plotPowerLaw(powerLawBestParams[i,1,:], 'edge-on', 'frac')
-		#plotKriekAndConroy(kriekAndConroyBestParams[i,1,:], 'edge-on', 'frac')
-		#plotFaucher(faucherBestParams[i,1,:], 'edge-on')
-		#plotCalzetti(calzettiNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
-		#plotCardelli(cardelliNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
-		#plotPowerLaw(powerLawNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
-		#plotKriekAndConroy(kriekAndConroyNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
-		errors = plotResiduals(calzettiBestParams[i,:,:], cardelliBestParams[i,:,:], 
+		plotCalzetti(calzettiBestParams[i,0,:], 'face-on', 'frac')
+		plotCardelli(cardelliBestParams[i,0,:], 'face-on', 'frac')
+		plotPowerLaw(powerLawBestParams[i,0,:], 'face-on', 'frac')
+		plotKriekAndConroy(kriekAndConroyBestParams[i,0,:], 'face-on', 'frac')
+		plotTEA(TEABestParams[i,0,:], 'face-on')
+		plotCalzetti(calzettiNoFracBestParams[i,0,:], 'face-on', 'noFrac')
+		plotCardelli(cardelliNoFracBestParams[i,0,:], 'face-on', 'noFrac')
+		plotPowerLaw(powerLawNoFracBestParams[i,0,:], 'face-on', 'noFrac')
+		plotKriekAndConroy(kriekAndConroyNoFracBestParams[i,0,:], 'face-on', 'noFrac')
+		plotCalzetti(calzettiBestParams[i,1,:], 'edge-on', 'frac')
+		plotCardelli(cardelliBestParams[i,1,:], 'edge-on', 'frac')
+		plotPowerLaw(powerLawBestParams[i,1,:], 'edge-on', 'frac')
+		plotKriekAndConroy(kriekAndConroyBestParams[i,1,:], 'edge-on', 'frac')
+		plotTEA(TEABestParams[i,1,:], 'edge-on')
+		plotCalzetti(calzettiNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
+		plotCardelli(cardelliNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
+		plotPowerLaw(powerLawNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
+		plotKriekAndConroy(kriekAndConroyNoFracBestParams[i,1,:], 'edge-on', 'noFrac')
+		errors = calcAllErrors(calzettiBestParams[i,:,:], cardelliBestParams[i,:,:], 
 							   powerLawBestParams[i,:,:], kriekAndConroyBestParams[i,:,:],
-							   faucherBestParams[i,:,:], 'frac')
-		errorsNoFrac = plotResiduals(calzettiNoFracBestParams[i,:,:], cardelliNoFracBestParams[i,:,:], 
+							   TEABestParams[i,:,:], 'frac')
+		errorsNoFrac = calcAllErrors(calzettiNoFracBestParams[i,:,:], cardelliNoFracBestParams[i,:,:], 
 							   powerLawNoFracBestParams[i,:,:], kriekAndConroyNoFracBestParams[i,:,:],
-							   faucherBestParams[i,:,:], 'noFrac')
+							   TEABestParams[i,:,:], 'noFrac')
 		fullErrors[i, :, :] = errors
 		fullErrorsNoFrac[i, :, :] = errorsNoFrac
-	#plotErrors(fullErrors, 'frac')
-	#plotErrors(fullErrorsNoFrac, 'noFrac')
 	plotErrorsSeparate(fullErrors, 'frac')
 	plotErrorsSeparate(fullErrorsNoFrac, 'noFrac')
-	#plotScaledErrors(fullErrors, 'frac')
-	#plotScaledErrors(fullErrorsNoFrac, 'noFrac')
+	plotErrorsSeparateShifted(fullErrors, 'frac')
+	plotErrorsSeparateShifted(fullErrorsNoFrac, 'noFrac')
+	#print('average threshold age difference from 10 Myrs in years:', np.mean(closestAgeDist*1e9 - 1e7))
+
+
